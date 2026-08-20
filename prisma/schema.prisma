@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TourType {
+  RESTAURANT
+  HOTEL
+  CAFE
+  SPA
+  BOAT
+  OTHER
+}
+
+model Tour {
+  id          String    @id @default(cuid())
+  name         String    // Tên thương hiệu (legacy/display)
+  type         TourType  // Lĩnh vực legacy/display
+  brand        String    // Tên thương hiệu legacy/display
+  thuongHieuId String?
+  thuongHieu   ThuongHieu? @relation(fields: [thuongHieuId], references: [id])
+  linhVucId    String?
+  linhVuc      LinhVuc?  @relation(fields: [linhVucId], references: [id])
+  khuVucId     String
+  khuVuc       KhuVuc    @relation(fields: [khuVucId], references: [id])
+  url          String
+  status       String    @default("Đang hoạt động")
+  chiNhanhs    ChiNhanh[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([brand, khuVucId])
+  @@unique([url])
+}
+
+model ThuongHieu {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  linhVucId String?
+  linhVuc   LinhVuc? @relation(fields: [linhVucId], references: [id])
+  tours     Tour[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LinhVuc {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  thuongHieus ThuongHieu[]
+  tours       Tour[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ChiNhanh {
+  id          String    @id @default(cuid())
+  name        String
+  phuongXaId  String
+  phuongXa    PhuongXa  @relation(fields: [phuongXaId], references: [id])
+  diaChi      String?
+  tourId      String
+  tour        Tour      @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([name, tourId])
+}
+
+model KhuVuc {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  phuongXas PhuongXa[]
+  tours     Tour[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PhuongXa {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  khuVucId  String
+  khuVuc    KhuVuc    @relation(fields: [khuVucId], references: [id])
+  chiNhanhs ChiNhanh[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}

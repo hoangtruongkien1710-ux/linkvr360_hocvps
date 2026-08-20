@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npx prisma *)",
+      "Bash(curl -i http://localhost:3003/api/tours)",
+      "Bash(curl -i http://localhost:3003/api/stats)",
+      "Bash(npx tsx *)",
+      "Bash(curl -s http://localhost:3003/_next/static/css/app/layout.css)",
+      "Bash(npx tsc *)",
+      "Bash(curl -s -o /tmp/tour-page.html -w \"%{http_code}\\\\n\" http://localhost:3003/)",
+      "Read(//d//**)",
+      "Bash(npx next *)",
+      "Bash(tee -a /tmp/tour360-dev.log)",
+      "Bash(curl -s -m 5 http://localhost:3003)",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3003/api/thuong-hieu)"
+    ]
+  }
+}
