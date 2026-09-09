@@ -41,8 +41,9 @@ services:
       HOSTNAME: 0.0.0.0
       PORT: 3000
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL must be set}
-    expose:
-      - "3000"
+    # Cổng host để truy cập qua IP: http://<IP>:<APP_PORT>. Đổi APP_PORT trong .env.production.
+    ports:
+      - "${APP_PORT:-8080}:3000"
     healthcheck:
       test:
         ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
@@ -56,22 +57,6 @@ services:
     networks:
       - frontend
       - backend
-
-  nginx:
-    image: nginx:1.27-alpine
-    restart: unless-stopped
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      # Add HTTPS after certificates are provisioned:
-      # - "443:443"
-      # - ./nginx/certs:/etc/nginx/certs:ro
-    depends_on:
-      app:
-        condition: service_healthy
-    networks:
-      - frontend
 
 volumes:
   postgres_data:

@@ -13,6 +13,10 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
+# shellcheck disable=SC1090
+APP_PORT="$(grep -E '^APP_PORT=' "$ENV_FILE" | cut -d= -f2)"
+APP_PORT="${APP_PORT:-8080}"
+
 echo ">> Pull code (branch: $BRANCH)"
 git fetch origin "$BRANCH"
 git reset --hard "origin/$BRANCH"
@@ -26,6 +30,7 @@ docker image prune -f
 echo ">> Trạng thái"
 docker compose -f "$COMPOSE_FILE" ps
 
-echo ">> Smoke test"
-sleep 3
-curl -fsS -I http://localhost | head -n 1 || echo "Chưa phản hồi — xem: docker compose -f $COMPOSE_FILE logs app"
+echo ">> Smoke test (http://localhost:$APP_PORT)"
+sleep 5
+curl -fsS -I "http://localhost:$APP_PORT" | head -n 1 \
+  || echo "Chưa phản hồi — xem: docker compose -f $COMPOSE_FILE logs app"
