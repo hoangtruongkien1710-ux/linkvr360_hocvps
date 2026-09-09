@@ -25,7 +25,10 @@ type Stats = {
 };
 type CatalogItem = { id: string; name: string; linhVucId?: string | null; _count?: { tours: number } };
 
-type IconName = 'home' | 'list' | 'location' | 'menu' | 'close';
+type IconName =
+  | 'home' | 'list' | 'location' | 'menu' | 'close'
+  | 'edit' | 'trash' | 'external' | 'plus'
+  | 'layers' | 'tag' | 'map' | 'globe' | 'check' | 'pause' | 'inbox';
 
 function Icon({ name }: { name: IconName }) {
   const paths: Record<IconName, string> = {
@@ -34,6 +37,17 @@ function Icon({ name }: { name: IconName }) {
     location: 'M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z M12 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
     menu: 'M4 6h16M4 12h16M4 18h16',
     close: 'M6 6l12 12M18 6 6 18',
+    edit: 'M12 20h9 M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z',
+    trash: 'M4 7h16 M9 7V4h6v3 M6 7l1 13h10l1-13 M10 11v6 M14 11v6',
+    external: 'M14 4h6v6 M20 4 10 14 M20 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h6',
+    plus: 'M12 5v14 M5 12h14',
+    layers: 'M12 3 3 7.5l9 4.5 9-4.5L12 3Z M3 12l9 4.5 9-4.5 M3 16.5l9 4.5 9-4.5',
+    tag: 'M11.6 3H4a1 1 0 0 0-1 1v7.6a1 1 0 0 0 .3.7l8.4 8.4a1 1 0 0 0 1.4 0l7.6-7.6a1 1 0 0 0 0-1.4L12.3 3.3A1 1 0 0 0 11.6 3Z M7.5 7.5h.01',
+    map: 'M9 3 3.5 5.5v15L9 18l6 3 5.5-2.5v-15L15 6 9 3Z M9 3v15 M15 6v15',
+    globe: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M3.5 9h17 M3.5 15h17 M12 3c2.5 2.6 2.5 15.4 0 18 M12 3c-2.5 2.6-2.5 15.4 0 18',
+    check: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M8 12.5l2.7 2.7L16 9.5',
+    pause: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z M10 9.5v5 M14 9.5v5',
+    inbox: 'M4 13h4l2 3h4l2-3h4 M5 13 7 5h10l2 8v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-5Z',
   };
 
   return <svg className="menu-icon" viewBox="0 0 24 24" aria-hidden="true"><path d={paths[name]} fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" /></svg>;
@@ -337,7 +351,7 @@ export default function HomePage() {
       <main className="app-shell">
       <header className="topbar">
         <div className="topbar-title"><button className="menu-toggle icon-button" onClick={() => setSidebarOpen(true)} aria-label="Mở menu"><Icon name="menu" /></button><div><p className="eyebrow">TOUR360 / QUẢN TRỊ NỘI BỘ</p><h1>{activeMenu === 'locations' ? 'Khu vực & phường/xã' : activeMenu === 'dashboard' ? 'Tổng quan' : 'Danh sách tour'}</h1></div></div>
-        {activeMenu === 'tours' && <button className="primary" onClick={openCreate}>+ Thêm tour</button>}
+        {activeMenu === 'tours' && <button className="primary" onClick={openCreate}><Icon name="plus" />Thêm tour</button>}
       </header>
 
       {error && <div className="alert error">{error}<button onClick={() => setError('')}>×</button></div>}
@@ -346,19 +360,19 @@ export default function HomePage() {
       {activeMenu === 'dashboard' && (
         <>
           <section className="stats-grid" aria-label="Tổng quan">
-            <div className="stat"><span>Tổng số tour</span><strong>{stats.total}</strong></div>
-            <div className="stat"><span>Đang hoạt động</span><strong className="green">{stats.active}</strong></div>
-            <div className="stat"><span>Tạm ngưng</span><strong className="muted">{stats.paused}</strong></div>
+            <div className="stat"><span className="stat-icon total"><Icon name="globe" /></span><span className="stat-body"><span>Tổng số tour</span><strong>{stats.total}</strong></span></div>
+            <div className="stat"><span className="stat-icon active"><Icon name="check" /></span><span className="stat-body"><span>Đang hoạt động</span><strong className="green">{stats.active}</strong></span></div>
+            <div className="stat"><span className="stat-icon paused"><Icon name="pause" /></span><span className="stat-body"><span>Tạm ngưng</span><strong className="muted">{stats.paused}</strong></span></div>
           </section>
           <section className="catalog-relation-grid">
             <div className="management-panel">
-              <div className="section-heading"><div><h2>Lĩnh vực</h2><span>{linhVucs.length} danh mục</span></div><button className="primary" onClick={() => void createCatalog('linh-vuc', 'lĩnh vực')}>+ Thêm</button></div>
-              <div className="relation-list">{linhVucs.map((item) => <div className={`relation-item ${item.id === selectedOverviewLinhVucId ? 'selected' : ''}`} key={item.id} onClick={() => setSelectedOverviewLinhVucId(item.id)}><div><strong>{item.name}</strong></div><div className="relation-actions"><button className="text-button" onClick={(event) => { event.stopPropagation(); void updateCatalog('linh-vuc', item, 'lĩnh vực'); }}>Sửa</button><button className="text-button danger" onClick={(event) => { event.stopPropagation(); void deleteCatalog('linh-vuc', item, 'lĩnh vực'); }}>Xóa</button></div></div>)}</div>
+              <div className="section-heading"><div><h2 className="panel-title"><Icon name="layers" />Lĩnh vực</h2><span>{linhVucs.length} danh mục</span></div><button className="primary" onClick={() => void createCatalog('linh-vuc', 'lĩnh vực')}><Icon name="plus" />Thêm</button></div>
+              <div className="relation-list">{linhVucs.map((item) => <div className={`relation-item ${item.id === selectedOverviewLinhVucId ? 'selected' : ''}`} key={item.id} onClick={() => setSelectedOverviewLinhVucId(item.id)}><span className="item-label"><Icon name="layers" /><strong>{item.name}</strong></span><div className="relation-actions"><button className="icon-btn" title="Sửa" aria-label="Sửa lĩnh vực" onClick={(event) => { event.stopPropagation(); void updateCatalog('linh-vuc', item, 'lĩnh vực'); }}><Icon name="edit" /></button><button className="icon-btn danger" title="Xóa" aria-label="Xóa lĩnh vực" onClick={(event) => { event.stopPropagation(); void deleteCatalog('linh-vuc', item, 'lĩnh vực'); }}><Icon name="trash" /></button></div></div>)}</div>
             </div>
             <div className="management-panel">
-              <div className="section-heading"><div><h2>Thương hiệu thuộc {selectedOverviewLinhVuc?.name ?? 'lĩnh vực'}</h2><span>{overviewBrands.length} thương hiệu</span></div><button className="primary" disabled={!selectedOverviewLinhVucId} onClick={() => void createCatalog('thuong-hieu', 'thương hiệu')}>+ Thêm</button></div>
+              <div className="section-heading"><div><h2 className="panel-title"><Icon name="tag" />Thương hiệu thuộc {selectedOverviewLinhVuc?.name ?? 'lĩnh vực'}</h2><span>{overviewBrands.length} thương hiệu</span></div><button className="primary" disabled={!selectedOverviewLinhVucId} onClick={() => void createCatalog('thuong-hieu', 'thương hiệu')}><Icon name="plus" />Thêm</button></div>
               <p className="panel-subtitle">Chọn một lĩnh vực bên trái để quản lý các thương hiệu thuộc lĩnh vực đó.</p>
-              <div className="relation-list">{overviewBrands.length === 0 ? <div className="empty">Chưa có thương hiệu nào thuộc lĩnh vực này.</div> : overviewBrands.map((item) => <div className="relation-item" key={item.id}><div><strong>{item.name}</strong></div><div className="relation-actions"><button className="text-button" onClick={() => void updateCatalog('thuong-hieu', item, 'thương hiệu')}>Sửa</button><button className="text-button danger" onClick={() => void deleteCatalog('thuong-hieu', item, 'thương hiệu')}>Xóa</button></div></div>)}</div>
+              <div className="relation-list">{overviewBrands.length === 0 ? <div className="empty"><Icon name="inbox" /><span>Chưa có thương hiệu nào thuộc lĩnh vực này.</span></div> : overviewBrands.map((item) => <div className="relation-item" key={item.id}><span className="item-label"><Icon name="tag" /><strong>{item.name}</strong></span><div className="relation-actions"><button className="icon-btn" title="Sửa" aria-label="Sửa thương hiệu" onClick={() => void updateCatalog('thuong-hieu', item, 'thương hiệu')}><Icon name="edit" /></button><button className="icon-btn danger" title="Xóa" aria-label="Xóa thương hiệu" onClick={() => void deleteCatalog('thuong-hieu', item, 'thương hiệu')}><Icon name="trash" /></button></div></div>)}</div>
             </div>
           </section>
         </>
@@ -375,8 +389,8 @@ export default function HomePage() {
           </section>
 
           <section className="table-section">
-            <div className="section-heading"><div><h2>Danh sách tour</h2><span>{tours.length} kết quả</span></div></div>
-            {loading ? <div className="empty">Đang tải dữ liệu...</div> : tours.length === 0 ? <div className="empty">Chưa có tour phù hợp. Hãy thêm tour đầu tiên.</div> : <div className="table-wrap"><table><thead><tr><th>Lĩnh vực</th><th>Thương hiệu</th><th>Khu vực</th><th>Chi nhánh</th><th>Trạng thái</th><th className="actions-col">Thao tác</th></tr></thead><tbody>{tours.map((tour) => <tr key={tour.id}><td>{tour.linhVuc?.name ?? typeLabels[tour.type] ?? tour.type}</td><td><strong>{tour.brand}</strong><small>{tour.url}</small></td><td>{tour.khuVuc.name}</td><td>{tour.chiNhanhs.length}</td><td><span className={`badge ${tour.status === 'Đang hoạt động' ? 'active' : 'paused'}`}>{tour.status}</span></td><td className="actions"><a href={tour.url} target="_blank" rel="noreferrer" title="Mở tour VR360">Mở tour ↗</a><button onClick={() => openEdit(tour)}>Sửa</button><button className="danger-text" onClick={() => void removeTour(tour)}>Xóa</button></td></tr>)}</tbody></table></div>}
+            <div className="section-heading"><div><h2 className="panel-title"><Icon name="list" />Danh sách tour</h2><span>{tours.length} kết quả</span></div></div>
+            {loading ? <div className="empty">Đang tải dữ liệu...</div> : tours.length === 0 ? <div className="empty"><Icon name="inbox" /><span>Chưa có tour phù hợp. Hãy thêm tour đầu tiên.</span></div> : <div className="table-wrap"><table><thead><tr><th>Lĩnh vực</th><th>Thương hiệu</th><th>Khu vực</th><th>Chi nhánh</th><th>Trạng thái</th><th className="actions-col">Thao tác</th></tr></thead><tbody>{tours.map((tour) => <tr key={tour.id}><td>{tour.linhVuc?.name ?? typeLabels[tour.type] ?? tour.type}</td><td><strong>{tour.brand}</strong><small>{tour.url}</small></td><td>{tour.khuVuc.name}</td><td>{tour.chiNhanhs.length}</td><td><span className={`badge ${tour.status === 'Đang hoạt động' ? 'active' : 'paused'}`}><Icon name={tour.status === 'Đang hoạt động' ? 'check' : 'pause'} />{tour.status}</span></td><td className="actions"><a className="btn-open" href={tour.url} target="_blank" rel="noreferrer" title="Mở tour VR360"><Icon name="external" />Mở tour</a><button className="icon-btn" title="Sửa" aria-label="Sửa tour" onClick={() => openEdit(tour)}><Icon name="edit" /></button><button className="icon-btn danger" title="Xóa" aria-label="Xóa tour" onClick={() => void removeTour(tour)}><Icon name="trash" /></button></td></tr>)}</tbody></table></div>}
           </section>
         </>
       )}
@@ -388,7 +402,7 @@ export default function HomePage() {
           <section className="management-grid">
             <div className="management-panel">
               <div className="section-heading">
-                <h2>Khu vực</h2>
+                <h2 className="panel-title"><Icon name="location" />Khu vực</h2>
                 <span>{khuVucs.length} khu vực</span>
               </div>
               <div className="location-list">
@@ -398,34 +412,34 @@ export default function HomePage() {
                     className={`location-item ${selectedLocationId === khuVuc.id ? 'selected' : ''}`}
                     onClick={() => setSelectedKhuVucId(khuVuc.id)}
                   >
-                    <span>{khuVuc.name}</span>
+                    <span className="item-label"><Icon name="location" />{khuVuc.name}</span>
                     <div className="ward-actions">
-                      <button className="text-button" onClick={(e) => { e.stopPropagation(); void renameKhuVuc(khuVuc); }}>Sửa</button>
-                      <button className="text-button danger" onClick={(e) => { e.stopPropagation(); void removeKhuVuc(khuVuc); }}>Xóa</button>
+                      <button className="icon-btn" title="Sửa" aria-label="Sửa khu vực" onClick={(e) => { e.stopPropagation(); void renameKhuVuc(khuVuc); }}><Icon name="edit" /></button>
+                      <button className="icon-btn danger" title="Xóa" aria-label="Xóa khu vực" onClick={(e) => { e.stopPropagation(); void removeKhuVuc(khuVuc); }}><Icon name="trash" /></button>
                     </div>
                   </div>
                 ))}
               </div>
-              <button className="secondary" onClick={() => void createKhuVuc()}>+ Thêm khu vực</button>
+              <button className="secondary" onClick={() => void createKhuVuc()}><Icon name="plus" />Thêm khu vực</button>
             </div>
 
             <div className="management-panel">
               <div className="section-heading">
-                <h2>Phường/xã</h2>
+                <h2 className="panel-title"><Icon name="map" />Phường/xã</h2>
                 <span>{selectedWards.length} phường/xã thuộc {khuVucs.find((item) => item.id === selectedLocationId)?.name ?? 'khu vực đã chọn'}</span>
               </div>
               <div className="ward-list">
-                {selectedWards.length === 0 ? <div className="empty">Chưa có phường/xã trong khu vực này.</div> : selectedWards.map((phuongXa) => (
+                {selectedWards.length === 0 ? <div className="empty"><Icon name="inbox" /><span>Chưa có phường/xã trong khu vực này.</span></div> : selectedWards.map((phuongXa) => (
                   <div key={phuongXa.id} className="ward-item">
-                    <span>{phuongXa.name}</span>
+                    <span className="item-label"><Icon name="map" />{phuongXa.name}</span>
                     <div className="ward-actions">
-                      <button className="text-button" onClick={() => void renamePhuongXa(phuongXa)}>Sửa</button>
-                      <button className="text-button danger" onClick={() => void removePhuongXa(phuongXa)}>Xóa</button>
+                      <button className="icon-btn" title="Sửa" aria-label="Sửa phường/xã" onClick={() => void renamePhuongXa(phuongXa)}><Icon name="edit" /></button>
+                      <button className="icon-btn danger" title="Xóa" aria-label="Xóa phường/xã" onClick={() => void removePhuongXa(phuongXa)}><Icon name="trash" /></button>
                     </div>
                   </div>
                 ))}
               </div>
-              <button className="secondary" onClick={() => void createPhuongXa()}>+ Thêm phường/xã</button>
+              <button className="secondary" onClick={() => void createPhuongXa()}><Icon name="plus" />Thêm phường/xã</button>
             </div>
           </section>
         </>
