@@ -1,1 +1,0 @@
-Mình bắt đầu viết migration và seed cho Thương hiệu & Lĩnh vực. Trước hết mình sẽ viết migration để thêm hai bảng danh mục, sau đó seed dữ liệu mẫu. Mình sẽ kiểm tra và chạy lệnh seed trước để bạn xác nhận.

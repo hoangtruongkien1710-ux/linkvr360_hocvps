@@ -4,6 +4,10 @@ node_modules
 .gitignore
 .env
 .env.*
+!.env.production.example
 *.log
+.claude
 AI_CONTEXT
 README.md
+DEPLOY.md
+deploy.sh

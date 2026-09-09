@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  postgres:
+  db:
     image: postgres:16-alpine
     restart: always
     environment:
@@ -12,7 +10,6 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./prisma/seed.sql:/docker-entrypoint-initdb.d/seed.sql
 
 volumes:
   postgres_data:

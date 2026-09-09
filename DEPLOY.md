@@ -54,12 +54,16 @@ ssh kiensmee@103.56.160.214 -p 24700
 Vào thư mục project (nơi đã `git clone` lúc đầu), ví dụ:
 
 ```bash
-cd ~/thongkevr360
+cd ~/linkvr360_hocvps
 ```
 
 > Lần đầu tiên, nếu VPS chưa có code:
-> `git clone https://github.com/hoangtruongkien1710-ux/thongkevr360.git`
+> `git clone https://github.com/hoangtruongkien1710-ux/linkvr360_hocvps.git`
 > rồi tạo `.env.production` từ `.env.production.example` và điền secret thật.
+>
+> Lưu ý khi điền `.env.production`:
+> - `DB_PASSWORD` và mật khẩu bên trong `DATABASE_URL` phải **giống hệt nhau**.
+> - Không viết chú thích `#` nằm cùng dòng với giá trị.
 
 Deploy:
 
@@ -130,5 +134,5 @@ docker compose -f compose.production.yaml --env-file .env.production up -d --bui
 
 - `.env.production` **chỉ tồn tại trên VPS**, đã nằm trong `.gitignore`. Không bao giờ commit. `DATABASE_URL` phải dùng host `db` (tên service Compose), không phải `localhost`.
 - `docker compose up -d --build` có downtime vài giây khi restart `app` — chấp nhận được với 1 người dùng nội bộ.
-- Có 3 file compose trong repo: `compose.yaml` (chỉ Postgres cho dev), `compose.production.yaml` (production đầy đủ — **dùng file này trên VPS**), `docker-compose.yml` (bản cũ, nên bỏ dần).
+- Có 2 file compose trong repo: `compose.yaml` (chỉ Postgres cho dev, chạy ở local), `compose.production.yaml` (production đầy đủ: db + migrate + app + nginx — **luôn dùng file này trên VPS**).
 - Muốn có staging: tạo branch `dev`, copy `compose.production.yaml` thành `compose.staging.yaml`, đổi cổng Nginx `80` → `8080`, đổi `-p` project name và tên volume, rồi deploy branch `dev` vào đó.
