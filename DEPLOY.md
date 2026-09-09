@@ -99,13 +99,13 @@ sudo ufw allow 8080/tcp
 cd ~/linkvr360_hocvps && git pull origin main && docker compose -f compose.production.yaml --env-file .env.production up -d --build
 ```
 
-Hoặc dùng script:
+Hoặc dùng script (khuyến nghị — deploy theo phiên bản, xem mục 9):
 
 ```bash
-cd ~/linkvr360_hocvps && chmod +x deploy.sh && ./deploy.sh
+cd ~/linkvr360_hocvps && chmod +x deploy.sh && ./deploy.sh v1.1.0
 ```
 
-> `deploy.sh` chạy `git reset --hard origin/main` — **ghi đè mọi thay đổi local trên VPS**. Không sửa code trực tiếp trên VPS.
+> `deploy.sh` chạy `git checkout -f` / `git reset --hard` — **ghi đè mọi thay đổi local trên VPS**. Không sửa code trực tiếp trên VPS.
 
 Lệnh deploy tự động:
 1. Build lại image từ code mới (`Dockerfile`, multi-stage).
@@ -152,19 +152,63 @@ VPS tự chạy `prisma migrate deploy` khi deploy — **không** chạy `migrat
 
 ## 8. Rollback khi bản mới lỗi
 
-```bash
-cd ~/linkvr360_hocvps && git log --oneline -5
-```
+Deploy lại phiên bản ổn định trước đó bằng tag:
 
 ```bash
-git checkout <commit_ổn_định> && docker compose -f compose.production.yaml --env-file .env.production up -d --build
+cd ~/linkvr360_hocvps && ./deploy.sh v1.0.0
+```
+
+Xem các phiên bản có sẵn:
+
+```bash
+git fetch --tags && git tag -l
 ```
 
 Rollback migration là việc khó — cẩn thận khi đổi schema. Với thay đổi giao diện thuần thì rollback code là đủ.
 
 ---
 
-## 9. Lưu ý
+## 9. Quản lý phiên bản (tag & release)
+
+Làm ở **máy local**, sau khi code đã `git push` lên `main` và `npm run build` pass.
+
+**1. Cập nhật `CHANGELOG.md`** — chuyển mục "[Chưa phát hành]" thành số phiên bản mới.
+
+**2. Tăng version trong `package.json`** (dòng `"version"`).
+
+**3. Commit, tạo tag, push:**
+
+```bash
+git add -A && git commit -m "Release v1.2.0"
+git tag -a v1.2.0 -m "v1.2.0 — mô tả ngắn"
+git push origin main --follow-tags
+```
+
+**4. Tạo Release trên GitHub:** vào
+`github.com/hoangtruongkien1710-ux/linkvr360_hocvps` → **Releases** → **Draft a new release**
+→ chọn tag `v1.2.0` → dán nội dung tương ứng trong `CHANGELOG.md` → **Publish**.
+
+(Nếu cài `gh`: `gh release create v1.2.0 --title v1.2.0 --notes-file <(sed -n '/## \[1.2.0\]/,/## \[/p' CHANGELOG.md)`.)
+
+**5. Deploy phiên bản đó lên VPS:**
+
+```bash
+./deploy.sh v1.2.0
+```
+
+### Quy tắc đánh số `vX.Y.Z`
+
+| Loại thay đổi | Ví dụ | Tăng |
+|---|---|---|
+| Sửa lỗi, không đổi cách dùng | `v1.1.0 → v1.1.1` | Z (patch) |
+| Thêm tính năng, vẫn tương thích | `v1.1.1 → v1.2.0` | Y (minor) |
+| Thay đổi lớn / phá vỡ tương thích | `v1.9.0 → v2.0.0` | X (major) |
+
+Số phiên bản đang chạy hiển thị ở chân sidebar của app — đối chiếu với `git tag` khi production có lỗi mà local thì không.
+
+---
+
+## 10. Lưu ý
 
 - `.env.production` **chỉ tồn tại trên VPS**, nằm trong `.gitignore`. Không bao giờ commit.
 - `DB_PASSWORD` và mật khẩu trong `DATABASE_URL` phải **giống hệt nhau**. `DATABASE_URL` dùng host `db` (tên service Compose), không phải `localhost`. Không viết chú thích `#` cùng dòng với giá trị.

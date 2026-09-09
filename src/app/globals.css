@@ -15,6 +15,7 @@ button, input, select { font:inherit; } button { cursor:pointer; } h1,h2,h3,p { 
 .sidebar-brand strong,.sidebar-brand small { display:block; } .sidebar-brand strong { font-size:15px; } .sidebar-brand small { margin-top:4px; color:#aebbc5; font-size:12px; }
 .sidebar-close { display:none; margin-left:auto; color:#d5dee5; }
 .sidebar-nav { display:flex; flex-direction:column; gap:6px; margin-top:34px; }
+.sidebar-foot { margin-top:auto; padding-top:20px; color:#8b97a2; font-size:12px; letter-spacing:.3px; }
 .nav-item { width:100%; min-height:48px; display:flex; align-items:center; gap:13px; padding:0 14px; border:1px solid transparent; border-radius:6px; background:transparent; color:var(--sidebar-text); text-align:left; font-size:14px; transition:background .2s,color .2s,border-color .2s; }
 .nav-item:hover,.nav-item.active { background:var(--sidebar-hover); color:#fff; } .nav-item.active { border-left:3px solid var(--orange); padding-left:11px; font-weight:700; } .nav-item svg { width:18px; height:18px; flex:0 0 auto; }
 .sidebar-overlay { display:none; position:fixed; inset:0; border:0; background:rgb(15 23 30 / 52%); z-index:49; }

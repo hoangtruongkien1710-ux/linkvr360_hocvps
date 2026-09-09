@@ -346,6 +346,7 @@ export default function HomePage() {
             </button>
           ))}
         </nav>
+        <div className="sidebar-foot">Phiên bản {process.env.APP_VERSION}</div>
       </aside>
       {sidebarOpen && <button className="sidebar-overlay" onClick={() => setSidebarOpen(false)} aria-label="Đóng menu" />}
       <main className="app-shell">

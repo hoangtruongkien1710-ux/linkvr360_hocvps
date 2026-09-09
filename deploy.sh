@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# Deploy production trên VPS. Chạy từ trong thư mục project: ./deploy.sh
+# Deploy production trên VPS. Chạy từ trong thư mục project.
+#   ./deploy.sh            -> deploy nhánh main mới nhất
+#   ./deploy.sh v1.1.0     -> deploy đúng tag v1.1.0 (dùng để rollback)
+#   ./deploy.sh dev        -> deploy nhánh dev
 set -euo pipefail
 
 cd "$(dirname "$0")"
 
-BRANCH="${1:-main}"
+REF="${1:-main}"
 COMPOSE_FILE="compose.production.yaml"
 ENV_FILE=".env.production"
 
@@ -13,13 +16,25 @@ if [ ! -f "$ENV_FILE" ]; then
   exit 1
 fi
 
-# shellcheck disable=SC1090
 APP_PORT="$(grep -E '^APP_PORT=' "$ENV_FILE" | cut -d= -f2)"
 APP_PORT="${APP_PORT:-8080}"
 
-echo ">> Pull code (branch: $BRANCH)"
-git fetch origin "$BRANCH"
-git reset --hard "origin/$BRANCH"
+echo ">> Fetch (branch + tag)"
+git fetch origin --tags --prune --force
+
+if git rev-parse -q --verify "refs/tags/$REF" >/dev/null; then
+  echo ">> Checkout tag $REF"
+  git checkout -f "$REF"
+elif git rev-parse -q --verify "refs/remotes/origin/$REF" >/dev/null; then
+  echo ">> Checkout nhánh $REF (bản mới nhất)"
+  git checkout -f -B "$REF" "origin/$REF"
+  git reset --hard "origin/$REF"
+else
+  echo "Không tìm thấy tag hoặc nhánh: $REF" >&2
+  exit 1
+fi
+
+echo ">> Đang chạy: $(git describe --tags --always) ($(git rev-parse --short HEAD))"
 
 echo ">> Build + restart containers"
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d --build
