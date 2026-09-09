@@ -64,6 +64,7 @@ model ChiNhanh {
   phuongXaId  String
   phuongXa    PhuongXa  @relation(fields: [phuongXaId], references: [id])
   diaChi      String?
+  soDienThoai String?
   tourId      String
   tour        Tour      @relation(fields: [tourId], references: [id], onDelete: Cascade)
   createdAt   DateTime  @default(now())

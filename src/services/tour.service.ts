@@ -1,6 +1,6 @@
 import { TourType } from '@prisma/client';
 import { AppError } from '@/lib/errors';
-import { isBasicUrl, normalizeText } from '@/lib/normalize';
+import { isBasicPhone, isBasicUrl, normalizeText } from '@/lib/normalize';
 import * as khuVucRepository from '@/repositories/khu-vuc.repository';
 import * as phuongXaRepository from '@/repositories/phuong-xa.repository';
 import * as tourRepository from '@/repositories/tour.repository';
@@ -51,7 +51,9 @@ async function validateTourPayload(payload: TourPayload) {
     const ward = phuongXaMap.get(branch.phuongXaId);
     if (!ward) throw new AppError(`Phường/xã của chi nhánh "${name}" không tồn tại`, 'PHUONGXA_NOT_FOUND', 404);
     if (ward.khuVucId !== payload.khuVucId) throw new AppError(`Chi nhánh "${name}" phải chọn phường/xã thuộc khu vực của tour`, 'BRANCH_WARD_MISMATCH');
-    return { name, phuongXaId: branch.phuongXaId, diaChi: branch.diaChi ? normalizeText(branch.diaChi) : null };
+    const soDienThoai = branch.soDienThoai ? normalizeText(branch.soDienThoai) : null;
+    if (soDienThoai && !isBasicPhone(soDienThoai)) throw new AppError(`Số điện thoại của chi nhánh "${name}" không hợp lệ`, 'BRANCH_PHONE_INVALID');
+    return { name, phuongXaId: branch.phuongXaId, diaChi: branch.diaChi ? normalizeText(branch.diaChi) : null, soDienThoai };
   });
   return { brand: brand.name, type: assertTourType(payload.type ?? 'OTHER'), thuongHieuId: brand.id, linhVucId: field.id, khuVucId: payload.khuVucId, url, status, chiNhanhs };
 }

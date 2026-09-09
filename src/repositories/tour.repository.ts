@@ -7,6 +7,7 @@ export type BranchInput = {
   name: string;
   phuongXaId: string;
   diaChi?: string | null;
+  soDienThoai?: string | null;
 };
 
 const tourInclude = {
@@ -47,6 +48,7 @@ export async function listTours(filters?: {
               { brand: { contains: search, mode: 'insensitive' } },
               { chiNhanhs: { some: { name: { contains: search, mode: 'insensitive' } } } },
               { chiNhanhs: { some: { diaChi: { contains: search, mode: 'insensitive' } } } },
+              { chiNhanhs: { some: { soDienThoai: { contains: search, mode: 'insensitive' } } } },
             ],
           }
         : {}),
@@ -83,6 +85,7 @@ export async function createTour(data: {
               name: branch.name,
               phuongXaId: branch.phuongXaId,
               diaChi: branch.diaChi ?? null,
+              soDienThoai: branch.soDienThoai ?? null,
             })),
           },
         },
@@ -130,6 +133,7 @@ export async function updateTour(
               name: branch.name,
               phuongXaId: branch.phuongXaId,
               diaChi: branch.diaChi ?? null,
+              soDienThoai: branch.soDienThoai ?? null,
             })),
           },
         },
